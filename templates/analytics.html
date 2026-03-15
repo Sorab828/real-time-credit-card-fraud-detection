@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Analytics</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+<a href="/">Dashboard</a>
+<a href="/analytics">Analytics</a>
+<a href="/transactions">Transactions</a>
+<a href="/fraud-alerts">Fraud Alerts</a>
+<a href="/about">About</a>
+
+</div>
+
+<h1 style="text-align:center">Fraud Analytics</h1>
+
+
+<div class="cards">
+
+<div class="card blue">
+<h3>Total Transactions</h3>
+<h2>{{data.total}}</h2>
+</div>
+
+<div class="card red">
+<h3>Fraud</h3>
+<h2>{{data.fraud}}</h2>
+</div>
+
+<div class="card purple">
+<h3>Legitimate</h3>
+<h2>{{data.legit}}</h2>
+</div>
+
+<div class="card orange">
+<h3>Suspicious</h3>
+<h2>{{data.suspicious}}</h2>
+</div>
+
+</div>
+
+
+<div style="width:400px;margin:auto">
+
+<canvas id="fraudChart"></canvas>
+
+</div>
+
+
+<script>
+
+const ctx = document.getElementById("fraudChart")
+
+new Chart(ctx, {
+
+type: "pie",
+
+data: {
+
+labels: ["Fraud", "Legitimate", "Suspicious"],
+
+datasets: [{
+
+data: [
+{{data.fraud}},
+{{data.legit}},
+{{data.suspicious}}
+],
+
+backgroundColor: [
+"#e74c3c",
+"#2ecc71",
+"#f1c40f"
+]
+
+}]
+
+}
+
+})
+
+</script>
+
+</body>
+
+</html>

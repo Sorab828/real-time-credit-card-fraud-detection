@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>All Transactions</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+<a href="/">Dashboard</a>
+<a href="/analytics">Analytics</a>
+<a href="/transactions">Transactions</a>
+<a href="/fraud-alerts">Fraud Alerts</a>
+<a href="/about">About</a>
+
+</div>
+
+
+<div class="page-container">
+
+<h1>All Transactions</h1>
+
+
+<!-- SEARCH + FILTER -->
+
+<div class="controls">
+
+<input type="text" id="searchInput" placeholder="Search by location..." onkeyup="searchTable()">
+
+<select id="filterStatus" onchange="filterTable()">
+
+<option value="All">All</option>
+<option value="Fraud">Fraud</option>
+<option value="Legitimate">Legitimate</option>
+
+</select>
+
+</div>
+
+
+<table id="transactionTable">
+
+<tr>
+
+<th>Status</th>
+<th>Location</th>
+<th>Amount</th>
+<th>Risk</th>
+<th>Time</th>
+
+</tr>
+
+{% for t in transactions %}
+
+<tr>
+
+<td class="status">{{t.status}}</td>
+
+<td>{{t.location}}</td>
+
+<td>₹{{t.amount}}</td>
+
+<td>{{t.risk}}%</td>
+
+<td>{{t.time}}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+
+<script>
+
+/* SEARCH FUNCTION */
+
+function searchTable(){
+
+let input=document.getElementById("searchInput").value.toLowerCase()
+
+let rows=document.querySelectorAll("#transactionTable tr")
+
+for(let i=1;i<rows.length;i++){
+
+let location=rows[i].cells[1].innerText.toLowerCase()
+
+if(location.includes(input)){
+
+rows[i].style.display=""
+
+}else{
+
+rows[i].style.display="none"
+
+}
+
+}
+
+}
+
+
+/* FILTER FUNCTION */
+
+function filterTable(){
+
+let filter=document.getElementById("filterStatus").value
+
+let rows=document.querySelectorAll("#transactionTable tr")
+
+for(let i=1;i<rows.length;i++){
+
+let status=rows[i].cells[0].innerText
+
+if(filter=="All" || status==filter){
+
+rows[i].style.display=""
+
+}else{
+
+rows[i].style.display="none"
+
+}
+
+}
+
+}
+
+</script>
+
+
+</body>
+
+</html>

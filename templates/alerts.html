@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Fraud Alerts</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+<a href="/">Dashboard</a>
+<a href="/analytics">Analytics</a>
+<a href="/transactions">Transactions</a>
+<a href="/fraud-alerts">Fraud Alerts</a>
+<a href="/about">About</a>
+
+</div>
+
+
+<div class="page-container">
+
+<h1>Fraud Alerts</h1>
+
+<table>
+
+<tr>
+
+<th>Location</th>
+<th>Amount</th>
+<th>Risk</th>
+<th>Time</th>
+
+</tr>
+
+{% for f in frauds %}
+
+<tr>
+
+<td>{{f.location}}</td>
+<td>₹{{f.amount}}</td>
+<td>{{f.risk}}%</td>
+<td>{{f.time}}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</body>
+
+</html>

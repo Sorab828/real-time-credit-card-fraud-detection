@@ -1,304 +1,180 @@
 <!DOCTYPE html>
-
 <html>
+
 <head>
 
 <title>Fraud Detection Dashboard</title>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/raphael"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/justgage"></script>
+<link rel="stylesheet" href="/static/style.css">
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="navbar">
 
-<h1>💳 Credit Card Fraud Detection Dashboard</h1>
-
-<div class="input-card">
-
-<form action="/predict" method="POST">
-
-<input type="number" step="0.01" name="amount" placeholder="Transaction Amount" required>
-
-<input type="number" step="0.01" name="time" placeholder="Transaction Time" required>
-
-<button type="submit">Analyze Transaction</button>
-
-</form>
+<a href="/">Dashboard</a>
+<a href="/analytics">Analytics</a>
+<a href="/transactions">Transactions</a>
+<a href="/fraud-alerts">Fraud Alerts</a>
+<a href="/about">About</a>
 
 </div>
 
-<!-- LIVE ANALYTICS -->
-
-<div class="analytics">
-
-<div class="analytics-card">
-<h3>Total Transactions</h3>
-<p>{{ transactions|length }}</p>
-</div>
-
-<div class="analytics-card">
-<h3>Normal</h3>
-<p>{{ transactions | selectattr("result","equalto","Normal") | list | length }}</p>
-</div>
-
-<div class="analytics-card">
-<h3>Suspicious</h3>
-<p>{{ transactions | selectattr("result","equalto","Suspicious") | list | length }}</p>
-</div>
-
-<div class="analytics-card">
-<h3>Fraud</h3>
-<p>{{ transactions | selectattr("result","equalto","Fraud") | list | length }}</p>
-</div>
-
-</div>
-
-<!-- RESULT CARDS -->
-
-<div class="cards">
-
-<div class="card">
-<h3>Risk Score</h3>
-<p class="risk">{{ risk | default(0) }}%</p>
-</div>
-
-<div class="card">
-<h3>Status</h3>
-<p class="status {{ result|default('waiting')|lower }}">{{ result | default("Waiting...") }}</p>
-</div>
-
-</div>
-
-<!-- GAUGE + CHART -->
 
 <div class="dashboard">
 
-<div class="gauge-card">
+<h1>AI Fraud Detection Monitoring</h1>
 
-<h2>Fraud Risk Meter</h2>
 
-<div id="gauge"></div>
+<!-- SYSTEM STATUS -->
 
+<div class="system-status">
+
+<div class="status-box">
+<h3>Engine</h3>
+<p class="active">ACTIVE</p>
 </div>
 
-<div class="chart-card">
-
-<h2>Fraud Analysis</h2>
-
-<canvas id="fraudChart"></canvas>
-
+<div class="status-box">
+<h3>Monitoring</h3>
+<p class="active">LIVE</p>
 </div>
 
+<div class="status-box">
+<h3>Last Scan</h3>
+<p id="scanTime"></p>
 </div>
 
-<!-- FRAUD TREND GRAPH -->
-
-<div class="trend-card">
-
-<h2>Fraud Trend Analytics</h2>
-
-<canvas id="trendChart"></canvas>
-
-</div>
-
-<!-- TRANSACTION TABLE -->
-
-<div class="table-card">
-
-<h2>📋 Transaction History</h2>
-
-<table>
-
-<tr>
-<th>Time</th>
-<th>Amount</th>
-<th>Risk</th>
-<th>Status</th>
-</tr>
-
-{% for t in transactions %}
-
-<tr>
-
-<td>{{ t.time }}</td>
-<td>{{ t.amount }}</td>
-<td>{{ t.risk }}%</td>
-
-<td>
-<span class="badge {{ t.result|lower }}">
-{{ t.result }}
-</span>
-</td>
-
-</tr>
-
-{% endfor %}
-
-{% if transactions|length == 0 %}
-
-<tr>
-<td colspan="4">No Transactions Yet</td>
-</tr>
-
-{% endif %}
-
-</table>
-
+<div class="status-box">
+<h3>System Scan</h3>
+<p id="scanStatus">READY</p>
 </div>
 
 </div>
 
-<script>
 
-var g = new JustGage({
+<!-- STATS -->
 
-id: "gauge",
+<div class="cards">
 
-value: {{ risk | default(0) }},
+<div class="card blue">
+<h3>Total Transactions</h3>
+<h2 id="total">0</h2>
+</div>
 
-min: 0,
-max: 100,
+<div class="card red">
+<h3>Fraud Detected</h3>
+<h2 id="fraud">0</h2>
+</div>
 
-title: "Risk Level",
-label: "%",
-
-animationSpeed: 1000,
-
-levelColors: ["#22c55e","#f59e0b","#ef4444"]
-
-});
-
-
-const ctx = document.getElementById('fraudChart');
-
-new Chart(ctx, {
-
-type:'doughnut',
-
-data:{
-
-labels:['Normal','Fraud'],
-
-datasets:[{
-
-data:[{{ normal | default(100) }},{{ fraud | default(0) }}],
-
-backgroundColor:['#22c55e','#ef4444']
-
-}]
-
-},
-
-options:{
-responsive:true
-}
-
-});
-
-
-const trendCtx = document.getElementById('trendChart');
-
-new Chart(trendCtx, {
-
-type:'bar',
-
-data:{
-
-labels:['Normal','Suspicious','Fraud'],
-
-datasets:[{
-
-label:'Transactions',
-
-data:[
-
-{{ transactions | selectattr("result","equalto","Normal") | list | length }},
-
-{{ transactions | selectattr("result","equalto","Suspicious") | list | length }},
-
-{{ transactions | selectattr("result","equalto","Fraud") | list | length }}
-
-],
-
-backgroundColor:[
-
-'#22c55e',
-'#f59e0b',
-'#ef4444'
-
-]
-
-}]
-
-},
-
-options:{
-responsive:true
-}
-
-});
-
-
-</script>
-
-{% if result == "Fraud" %}
-
-<div id="fraudPopup" class="popup">
-
-🚨 Fraudulent Transaction Detected!
+<div class="card purple">
+<h3>Average Risk</h3>
+<h2 id="risk">0%</h2>
+</div>
 
 </div>
 
-<audio id="alertSound">
 
-<source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
-
-</audio>
-
-<script>
-
-setTimeout(function(){
-
-document.getElementById("fraudPopup").style.display="block";
-
-document.getElementById("alertSound").play();
-
-},500);
+<div class="main-grid">
 
 
-if ("Notification" in window) {
+<!-- TRANSACTION PANEL -->
 
-if (Notification.permission === "granted") {
+<div class="panel">
 
-new Notification("Fraud Alert!", {
+<h2>New Transaction</h2>
 
-body: "Suspicious transaction detected.",
+<input id="amount" placeholder="Amount">
 
-icon: "https://cdn-icons-png.flaticon.com/512/1828/1828843.png"
+<input id="location" placeholder="Location">
 
-});
+<select id="card">
+<option>Visa</option>
+<option>MasterCard</option>
+<option>RuPay</option>
+</select>
 
-}
+<select id="category">
+<option>Grocery</option>
+<option>Shopping</option>
+<option>Travel</option>
+<option>Electronics</option>
+</select>
 
-else if (Notification.permission !== "denied") {
+<button onclick="processTransaction()">Process Transaction</button>
 
-Notification.requestPermission();
+<p id="loader" style="display:none;color:#3498db;margin-top:10px">
+Processing Transaction...
+</p>
 
-}
+<br>
 
-}
+<button onclick="clearDashboard()" style="background:#e74c3c">
+Clear Dashboard
+</button>
 
-</script>
+</div>
 
-{% endif %}
+
+<!-- MONITORING PANEL -->
+
+<div class="panel">
+
+<h2>Monitoring Summary</h2>
+
+<p>Total Checked : <span id="totalCheck">0</span></p>
+
+<p>Fraud Detected : <span id="fraudCheck">0</span></p>
+
+<p>Legitimate : <span id="legitCount">0</span></p>
+
+<hr>
+
+<h2>Risk Level</h2>
+
+<h1 id="riskLevel" class="risk-badge low-risk">LOW RISK</h1>
+
+</div>
+
+</div>
+
+
+<!-- RISK ANALYSIS -->
+
+<div class="panel">
+
+<h2>Risk Analysis</h2>
+
+<p>Amount Risk : <span id="amountRisk">-</span></p>
+<p>Location Risk : <span id="locationRisk">-</span></p>
+<p>Category Risk : <span id="categoryRisk">-</span></p>
+<p>Frequency Risk : <span id="frequencyRisk">-</span></p>
+<p>Time Risk : <span id="timeRisk">-</span></p>
+<p>Card Risk : <span id="cardRisk">-</span></p>
+
+<hr>
+
+<b>Final Risk Score : <span id="finalRisk">0%</span></b>
+
+</div>
+
+
+<!-- ACTIVITY FEED -->
+
+<div class="activity-panel">
+
+<h2>Live Fraud Activity</h2>
+
+<ul id="activityFeed"></ul>
+
+</div>
+
+</div>
+
+
+<script src="/static/script.js"></script>
 
 </body>
+
 </html>
